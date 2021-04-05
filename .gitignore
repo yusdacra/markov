@@ -3,3 +3,5 @@
 *.yaml
 log
 tswift_1989
+/.vscode
+/shell.nix
