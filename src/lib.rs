@@ -72,6 +72,12 @@ where
     order: usize,
 }
 
+impl<T: Chainable> Default for Chain<T> {
+    fn default() -> Self {
+        Chain::new()
+    }
+}
+
 impl<T> Chain<T>
 where
     T: Chainable,
@@ -93,7 +99,7 @@ where
                 map.insert(vec![None; order], HashMap::new());
                 map
             },
-            order: order,
+            order,
         }
     }
 
@@ -155,7 +161,7 @@ where
         if !self.map.contains_key(&curs) {
             return Vec::new();
         }
-        let mut ret = vec![token.clone()];
+        let mut ret = vec![token];
         loop {
             let next = self.map[&curs].next();
             curs = curs[1..self.order].to_vec();
@@ -177,10 +183,7 @@ where
 
     /// Produces an iterator for the specified number of generated token collections.
     pub fn iter_for(&self, size: usize) -> SizedChainIterator<T> {
-        SizedChainIterator {
-            chain: self,
-            size: size,
-        }
+        SizedChainIterator { chain: self, size }
     }
 
     /// Create a graph using `petgraph` from the markov chain.
@@ -224,7 +227,7 @@ where
             .for_each(|(state, next, p)| {
                 let mut next_state = state.clone();
                 next_state.remove(0);
-                next_state.push(next.clone());
+                next_state.push(next);
 
                 graph.add_edge(state_map[&state], state_map[&next_state], p);
             });
@@ -265,7 +268,7 @@ where
 impl Chain<String> {
     /// Feeds a string of text into the chain.
     pub fn feed_str(&mut self, string: &str) -> &mut Chain<String> {
-        self.feed(&string.split(' ').map(|s| s.to_owned()).collect::<Vec<_>>())
+        self.feed(&string.split(' ').map(str::to_owned).collect::<Vec<_>>())
     }
 
     /// Feeds a properly formatted file into the chain. This file should be formatted such that
@@ -277,7 +280,7 @@ impl Chain<String> {
             let words = line
                 .split_whitespace()
                 .filter(|word| !word.is_empty())
-                .map(|s| s.to_owned())
+                .map(str::to_owned)
                 .collect::<Vec<_>>();
             self.feed(&words);
         }
@@ -289,7 +292,7 @@ impl Chain<String> {
         let mut ret = String::new();
         for s in &vec {
             ret.push_str(&s);
-            ret.push_str(" ");
+            ret.push(' ');
         }
         let len = ret.len();
         if len > 0 {
@@ -337,7 +340,7 @@ where
     T: Chainable + 'a,
 {
     type Item = Vec<T>;
-    fn next(&mut self) -> Option<Vec<T>> {
+    fn next(&mut self) -> Option<Self::Item> {
         if self.size > 0 {
             self.size -= 1;
             Some(self.chain.generate())
@@ -365,7 +368,7 @@ where
     T: Chainable + 'a,
 {
     type Item = Vec<T>;
-    fn next(&mut self) -> Option<Vec<T>> {
+    fn next(&mut self) -> Option<Self::Item> {
         Some(self.chain.generate())
     }
 }
@@ -397,7 +400,7 @@ where
             sum += value;
         }
         let mut rng = thread_rng();
-        let cap = rng.gen_range(0, sum);
+        let cap = rng.gen_range(0..sum);
         sum = 0;
         for (key, &value) in self.iter() {
             sum += value;
@@ -482,7 +485,7 @@ mod test {
     fn iter_for() {
         let mut chain = Chain::new();
         chain.feed(vec![3u8, 5, 10]).feed(vec![5, 12]);
-        assert_eq!(chain.iter_for(5).collect::<Vec<_>>().len(), 5);
+        assert_eq!(chain.iter_for(5).count(), 5);
     }
 
     #[test]
@@ -531,7 +534,7 @@ mod test {
     fn str_iter_for() {
         let mut chain = Chain::new();
         chain.feed_str("I like cats and I like dogs");
-        assert_eq!(chain.str_iter_for(5).collect::<Vec<_>>().len(), 5);
+        assert_eq!(chain.str_iter_for(5).count(), 5);
     }
 
     #[test]

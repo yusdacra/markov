@@ -8,12 +8,7 @@ keywords = ["markov", "chain", "probability"]
 documentation = "https://docs.rs/markov/"
 repository = "https://github.com/aatxe/markov"
 readme = "README.md"
-exclude = [
-    "conquest_of_bread",
-    "jabberwocky",
-    "koran",
-    "test",
-]
+exclude = ["conquest_of_bread", "jabberwocky", "koran", "test"]
 
 [badges]
 maintenance = { status = "passively-maintained" }
@@ -27,9 +22,9 @@ yaml = ["serde_yaml"]
 
 [dependencies]
 getopts = { version = "0.2", optional = true }
-itertools = { version = "0.9", optional = true }
+itertools = { version = "0.10", optional = true }
 petgraph = { version = "0.5", optional = true }
-rand = "0.7"
-serde = "1.0"
+rand = "0.8"
+serde = { version = "1.0", features = ["rc"] }
 serde_derive = "1.0"
 serde_yaml = { version = "0.8", optional = true }
