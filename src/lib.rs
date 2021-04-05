@@ -20,40 +20,26 @@
 //! ```
 #![warn(missing_docs)]
 
-#[cfg(feature = "graph")]
-extern crate itertools;
-#[cfg(feature = "graph")]
-extern crate petgraph;
-extern crate rand;
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-#[cfg(feature = "yaml")]
-extern crate serde_yaml;
-
-use std::borrow::ToOwned;
-use std::collections::hash_map::Entry::{Occupied, Vacant};
+#[cfg(feature = "ahash")]
+use ahash::AHashMap as HashMap;
+#[cfg(not(feature = "ahash"))]
 use std::collections::HashMap;
-use std::fs::File;
-use std::hash::Hash;
-use std::io::prelude::*;
-use std::io::{BufReader, Result};
-#[cfg(feature = "yaml")]
-use std::io::{Error, ErrorKind};
-use std::iter::Map;
-use std::path::Path;
+use std::{
+    borrow::ToOwned,
+    collections::hash_map::Entry::{Occupied, Vacant},
+    fs::File,
+    hash::Hash,
+    io::{prelude::*, BufReader, Error, ErrorKind, Result},
+    iter::Map,
+    path::Path,
+};
 
 #[cfg(feature = "graph")]
 use itertools::Itertools;
 #[cfg(feature = "graph")]
 use petgraph::graph::Graph;
 use rand::{thread_rng, Rng};
-#[cfg(feature = "yaml")]
-use serde::de::DeserializeOwned;
-#[cfg(feature = "yaml")]
-use serde::Serialize;
-#[cfg(feature = "yaml")]
-use serde_yaml as yaml;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 /// The definition of all types that can be used in a `Chain`.
 pub trait Chainable: Eq + Hash + Clone {}

@@ -17,8 +17,7 @@ use markov::Chain;
 fn main() {
     markov_gen(args().collect())
         .iter()
-        .map(|s| println!("{}", s))
-        .count();
+        .for_each(|s| println!("{}", s));
 }
 
 #[cfg(all(not(feature = "getopts"), not(test)))]

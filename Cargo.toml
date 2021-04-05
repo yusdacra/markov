@@ -9,22 +9,22 @@ documentation = "https://docs.rs/markov/"
 repository = "https://github.com/aatxe/markov"
 readme = "README.md"
 exclude = ["conquest_of_bread", "jabberwocky", "koran", "test"]
+edition = "2018"
 
 [badges]
 maintenance = { status = "passively-maintained" }
 travis-ci = { repository = "aatxe/markov" }
 
 [features]
-default = ["graph", "markgen", "yaml"]
+default = ["graph", "markgen", "ahash"]
 graph = ["petgraph", "itertools"]
-markgen = ["getopts"]
-yaml = ["serde_yaml"]
+markgen = ["getopts", "yaml"]
 
 [dependencies]
 getopts = { version = "0.2", optional = true }
 itertools = { version = "0.10", optional = true }
 petgraph = { version = "0.5", optional = true }
 rand = "0.8"
-serde = { version = "1.0", features = ["rc"] }
-serde_derive = "1.0"
-serde_yaml = { version = "0.8", optional = true }
+serde = { version = "1.0", features = ["derive"] }
+yaml = { package = "serde_yaml", version = "0.8", optional = true }
+ahash = { version = "0.7", optional = true, features = ["serde"] }
